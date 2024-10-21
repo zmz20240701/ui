@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+	/// 程序入口
 @main
 struct uiApp: App {
     var body: some Scene {
