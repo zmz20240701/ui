@@ -8,41 +8,45 @@
 import SwiftUI
 
 struct AudioPlayerView: View {
-	@StateObject private var viewModel: AudioPlayerViewModel
-	
-	init(audioFile: AudioFile) {
-		_viewModel = StateObject(wrappedValue: AudioPlayerViewModel(audioFile: audioFile))
-	}
+	@StateObject var viewModel: AudioPlayerViewModel
+	var audioFile: AudioFile
 	
 	var body: some View {
 		VStack {
-				// 播放/暂停按钮
+			Text(audioFile.title)
+				.font(.title)
+				.padding()
+			
+				// 播放按钮
 			Button(action: {
-				if viewModel.audioFile.isPlaying {
-					viewModel.player?.pause()
-					viewModel.audioFile.isPlaying = false
-				} else {
-					viewModel.play()
-				}
+				viewModel.playAudio(file: audioFile) // 播放音频
 			}) {
-				Image(systemName: viewModel.audioFile.isPlaying ? "pause.circle" : "play.circle")
-					.resizable()
-					.frame(width: 50, height: 50)
+				Text("播放")
 					.padding()
+					.background(Color.blue)
+					.foregroundColor(.white)
+					.cornerRadius(8)
 			}
 			
-				// 显示音频文本
-			TranscriptView(viewModel: viewModel)
+			List(audioFile.transcript ?? [], id: \.id) { transcript in
+				Button(action: {
+						// 点击句子，音频跳转到对应时间点
+					viewModel.seekToTime(time: transcript.startTime)
+				}) {
+					HStack {
+						Text(transcript.sentence)
+						Spacer()
+						Text(formatTime(transcript.startTime))
+							.foregroundColor(.gray)
+					}
+				}
+			}
 		}
-		.padding()
 	}
-}
-#Preview {
-	AudioPlayerView(
-		audioFile: AudioFile(
-			title: "Title",
-			url: "https://example.com/audio.mp3",
-			duration: 0.5, transcript: nil
-		)
-	)
+	
+	private func formatTime(_ time: TimeInterval) -> String {
+		let minutes = Int(time) / 60
+		let seconds = Int(time) % 60
+		return String(format: "%02d:%02d", minutes, seconds)
+	}
 }

@@ -2,14 +2,15 @@ import SwiftUI
 
 struct TranscriptView: View {
 	@ObservedObject var viewModel: AudioPlayerViewModel
+	var audioFile: AudioFile
 	
 	var body: some View {
 		VStack {
-			Text(viewModel.audioFile.title)
+			Text(audioFile.title)
 				.font(.title)
 				.padding()
 			
-			List(viewModel.audioFile.transcript ?? [], id: \.id) { transcript in
+			List(audioFile.transcript ?? [], id: \.id) { transcript in
 				Button(action: {
 						// 点击句子，音频跳转到对应时间点
 					viewModel.seekToTime(time: transcript.startTime)
